@@ -16,12 +16,14 @@ const Drawer = createDrawerNavigator();
 
 import HomeScreen from './pages/Home';
 import MapScreen from './pages/Map';
+import MainScreen from './pages/Main';
 
 const App = () => {   
   return (
     <>
       <NavigationContainer independent={true}>
           <Drawer.Navigator initialRouteName="Main">
+            <Drawer.Screen name="Main" component={MainScreen} />
             <Drawer.Screen name="Home" component={HomeScreen} />
             <Drawer.Screen name="Map" component={MapScreen} />
           </Drawer.Navigator>

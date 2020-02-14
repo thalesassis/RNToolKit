@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, StyleSheet, View, Text } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
+import TopBar from '../shared/TopBar';
 
 class Home extends Component {
   render() {
@@ -19,16 +20,12 @@ export default class HomeScreen extends Component {
   render() {
     return (
       <>
-        <Stack.Navigator>
-          <Stack.Screen name="Home" component={Home} options={{
+        <Stack.Navigator screenOptions={{ 
           headerRight: () => (
-            <Button
-              onPress={() => alert('This is a button!')}
-              title="Info"
-              color="#fff"
-            />
-          ),
-        }} />
+            <TopBar nav={this.props.navigation} />
+          )
+        }}>
+          <Stack.Screen name="Home" component={Home} />
         </Stack.Navigator>
       </>
     );
