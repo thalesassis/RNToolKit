@@ -1,11 +1,27 @@
-import React, { Component } from 'react';
-import { Button, StyleSheet, View, Text } from 'react-native';
+import React, { Component, useEffect } from 'react';
+import { AppState, Button, StyleSheet, View, Text, YellowBox } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import TopBar from '../shared/TopBar';
+import { connect, disconnect } from '../services/socket';
 
-class Home extends Component {
+YellowBox.ignoreWarnings([ 
+  'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?'
+])
+
+class Home extends Component { 
+  
+  componentDidMount() { 
+    disconnect();    
+    connect();
+  }
+
+  componentWillUnmount() {
+    disconnect();
+  } 
+
+
   render() {
-    return (
+    return ( 
       <>
       <View style={styles.MainContainer}>
         <Text style={{ fontSize: 23 }}> Home </Text>
@@ -18,8 +34,8 @@ class Home extends Component {
 const Stack = createStackNavigator();
 export default class HomeScreen extends Component {
   render() {
-    return (
-      <>
+    return ( 
+      <> 
         <Stack.Navigator screenOptions={{ 
           headerRight: () => (
             <TopBar nav={this.props.navigation} />

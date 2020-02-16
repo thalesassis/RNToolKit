@@ -15,7 +15,7 @@ import { NavigationContainer } from '@react-navigation/native';
 const Drawer = createDrawerNavigator();
 
 import HomeScreen from './pages/Home';
-import MapScreen from './pages/Map';
+import MapScreen from './pages/Map'; 
 import MainScreen from './pages/Main';
 
 const App = () => {   
