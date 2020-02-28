@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import { ScrollView, StyleSheet, View, Text, Button, TextInput, Alert, Dimensions } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
 import {request, check, PERMISSIONS, RESULTS} from 'react-native-permissions';
-import { NavigationContainer } from '@react-navigation/native';
 
 
-class Main extends Component {
-  
+export default class Permissions extends Component {  
   state = {
     name: "",
     permissions: [{
@@ -21,6 +18,13 @@ class Main extends Component {
       permissionName: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
     }]
   };
+
+  nav:any;
+
+  constructor(props:any) {
+    super(props);
+    this.nav = props.navigation;
+  }
   
   async checkPermission(permission:any) {
     return await check(permission).then(result => {
@@ -113,9 +117,11 @@ class Main extends Component {
         <Button 
           disabled={!this.isAllGranted() || this.state.name.length == 0}
           title="Start App" 
-          onPress={() => this.props.navigation.navigate('Home')}
+          onPress={() => { 
+            this.nav.replace('Home',{name:this.state.name}) 
+          }}
         />
-        </View>
+        </View>  
 
       </View>
       </>
@@ -123,18 +129,6 @@ class Main extends Component {
   }
 }
 
-const Stack = createStackNavigator();
-export default class MainScreen extends Component {
-  render() {
-    return (
-      <>
-        <Stack.Navigator>
-          <Stack.Screen name="Permissions" component={Main} />
-        </Stack.Navigator>
-      </>
-    );
-  }
-}
 
 const styles = StyleSheet.create({
   mainContainer: {

@@ -1,19 +1,23 @@
 import io from 'socket.io-client';
 
-const socket = io('http://192.168.0.106:3002', {autoConnect: false});
+const socket = io('http://192.168.0.103:3002', {autoConnect: false});
 
-function connect() { 
+
+function connect(userName, callback:any) { 
   socket.connect();
-  
-  console.log("conn1");  
   socket.on('connect', () => { 
-    console.log("conn2"); 
-    socket.emit("newUser",{ name: 'Thales' });
+    
+    socket.emit("newUser",{ name: userName });
   });
+
+  socket.on('userList', function(userList:any) {
+    callback(userList);
+  })
 }
 
 function disconnect() {
   if(socket.connected) {
+    console.log("disconnected");
     socket.disconnect();
   }
 }

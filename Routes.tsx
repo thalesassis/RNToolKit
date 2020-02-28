@@ -1,35 +1,21 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
-
-import * as React from 'react';
-
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import React, { Component } from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-const Drawer = createDrawerNavigator();
+import Permissions from './pages/Permissions';
+import Home from './pages/Home';
 
-import HomeScreen from './pages/Home';
-import MapScreen from './pages/Map'; 
-import MainScreen from './pages/Main';
-
-const App = () => {   
-  return (
-    <>
-      <NavigationContainer independent={true}>
-          <Drawer.Navigator initialRouteName="Main">
-            <Drawer.Screen name="Main" component={MainScreen} />
-            <Drawer.Screen name="Home" component={HomeScreen} />
-            <Drawer.Screen name="Map" component={MapScreen} />
-          </Drawer.Navigator>
+const Stack = createStackNavigator();
+export default class Routes extends Component {
+  render() {
+    return (
+      <>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{headerShown: true}}>
+          <Stack.Screen name="Permissions" component={Permissions} />
+          <Stack.Screen name="Home" component={Home} />
+        </Stack.Navigator>
       </NavigationContainer>
-    </>
-  );
-};
-
-export default App;
+      </>
+    );
+  }
+}

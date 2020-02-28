@@ -8,15 +8,33 @@
  * @format
  */
 
-import * as React from 'react';
+import React, { Component } from 'react';
 import Routes from './Routes';
 
-const App = () => {
-  return (
-    <>
-      <Routes />
-    </>
-  );
+const initialState = {
+  menu: {
+    open: true
+  },
+  toggleMenu: (prop:boolean) => {
+    console.log("toggleMenu");
+    return (initialState.menu.open = prop);
+  }
+}
+
+export const MyContext = React.createContext(initialState);
+
+class App extends Component {
+  state = initialState;
+
+  render() {
+    return (
+      <>
+      <MyContext.Provider value={this.state}>
+        <Routes />
+      </MyContext.Provider>
+      </>
+    );
+  }
 };
 
 export default App;
