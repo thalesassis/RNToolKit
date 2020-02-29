@@ -12,22 +12,22 @@ YellowBox.ignoreWarnings([
 export default class Home extends Component { 
   constructor(props:any) { 
     super(props);
-  }
+  } 
 
   state = { 
     open: true,
     userList: []
   }
-   
+
   componentDidMount() {   
     this.setState({userList: []});
-    disconnect();      
-    let name = this.props.route.params.name; 
-    console.log(name);
-    connect(name, (userList:any) => {    
-      this.setState({userList:userList}); 
-    }) 
-    
+    if(!this.context.isConnected) {
+      let name = this.props.route.params.name; 
+      connect(name, (userList:any) => {    
+        this.setState({userList: this.context.updateUserList(userList)}); 
+        this.setState({isConnected: this.context.updateIsConnected(true)}); 
+      }) 
+    }
   }
 
   componentWillUnmount() {
@@ -40,30 +40,26 @@ export default class Home extends Component {
       <>
      <View style={styles.mainContainer}>
 
-      <Menu></Menu>
-      <MyContext.Consumer>
-        {context => (
-        <TouchableOpacity style={styles.openButton} onPress={() => this.setState({ open: context.toggleMenu(!context.menu.open) })}>
-          <Text>OpenDrawer</Text>
-        </TouchableOpacity>
-        )}
-      </MyContext.Consumer>
+      <Menu nav={this.props.navigation}></Menu>
 
-      <ScrollView style={styles.listContainer}>
-        {this.state.userList.map((item, i) => (
-          <View key={item.id} style={styles.listItem}>
-            <View  style={(i === (this.state.userList.length - 1)) ? styles.textContainer_last : styles.textContainer}>
-              <Text style={styles.listTextLeft}>{item.name}</Text>
-            </View>
-          </View>
-        )
-        )}
+        <ScrollView style={styles.listContainer}>
+          <MyContext.Consumer>
+            { context => context.userList.map((item:any, i:any) => (
+                <View key={item.id} style={styles.listItem}>
+                  <View  style={(i === (context.userList.length - 1)) ? styles.textContainer_last : styles.textContainer}>
+                    <Text style={styles.listTextLeft}>{item.name}</Text>
+                  </View>
+                </View>
+            ))}
+          </MyContext.Consumer>
         </ScrollView>
       </View>
       </>
     );
   }
 }
+
+Home.contextType = MyContext;
 
 const styles = StyleSheet.create({
   openButton: {

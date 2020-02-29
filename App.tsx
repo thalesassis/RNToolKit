@@ -12,13 +12,21 @@ import React, { Component } from 'react';
 import Routes from './Routes';
 
 const initialState = {
+  isConnected: false,
   menu: {
-    open: true
+    open: false
+  },
+  userList: [],
+  updateIsConnected: (status:boolean) => {
+    return (initialState.isConnected = status);
+  },
+  updateUserList: (list:any) => {
+    return (initialState.userList = list);
   },
   toggleMenu: (prop:boolean) => {
-    console.log("toggleMenu");
     return (initialState.menu.open = prop);
-  }
+  },
+
 }
 
 export const MyContext = React.createContext(initialState);
