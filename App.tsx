@@ -10,26 +10,7 @@
 
 import React, { Component } from 'react';
 import Routes from './Routes';
-
-const initialState = {
-  isConnected: false,
-  menu: {
-    open: false
-  },
-  userList: [],
-  updateIsConnected: (status:boolean) => {
-    return (initialState.isConnected = status);
-  },
-  updateUserList: (list:any) => {
-    return (initialState.userList = list);
-  },
-  toggleMenu: (prop:boolean) => {
-    return (initialState.menu.open = prop);
-  },
-
-}
-
-export const MyContext = React.createContext(initialState);
+import { initialState, GlobalState } from './shared/GlobalState';
 
 class App extends Component {
   state = initialState;
@@ -37,9 +18,9 @@ class App extends Component {
   render() {
     return (
       <>
-      <MyContext.Provider value={this.state}>
+      <GlobalState.Provider value={this.state}>
         <Routes />
-      </MyContext.Provider>
+      </GlobalState.Provider>
       </>
     );
   }

@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, YellowBox, Dimensions, ScrollView, TouchableOpa
 import { createStackNavigator } from '@react-navigation/stack';
 import Menu from '../shared/Menu';
 import { connect, disconnect } from '../services/socket';
-import { MyContext } from '../App';
+import { GlobalState } from '../shared/GlobalState';
 
 YellowBox.ignoreWarnings([ 
   'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?'
@@ -23,7 +23,7 @@ export default class Home extends Component {
     this.setState({userList: []});
     if(!this.context.isConnected) {
       let name = this.props.route.params.name; 
-      connect(name, (userList:any) => {    
+      connect(name, (userList:any) => {     
         this.setState({userList: this.context.updateUserList(userList)}); 
         this.setState({isConnected: this.context.updateIsConnected(true)}); 
       }) 
@@ -31,8 +31,8 @@ export default class Home extends Component {
   }
 
   componentWillUnmount() {
-    this.setState({userList: []});
-    disconnect();
+    //this.setState({userList: []});
+    //disconnect();
   } 
 
   render() {
@@ -43,7 +43,7 @@ export default class Home extends Component {
       <Menu nav={this.props.navigation}></Menu>
 
         <ScrollView style={styles.listContainer}>
-          <MyContext.Consumer>
+          <GlobalState.Consumer>
             { context => context.userList.map((item:any, i:any) => (
                 <View key={item.id} style={styles.listItem}>
                   <View  style={(i === (context.userList.length - 1)) ? styles.textContainer_last : styles.textContainer}>
@@ -51,7 +51,7 @@ export default class Home extends Component {
                   </View>
                 </View>
             ))}
-          </MyContext.Consumer>
+          </GlobalState.Consumer>
         </ScrollView>
       </View>
       </>
@@ -59,7 +59,7 @@ export default class Home extends Component {
   }
 }
 
-Home.contextType = MyContext;
+Home.contextType = GlobalState;
 
 const styles = StyleSheet.create({
   openButton: {

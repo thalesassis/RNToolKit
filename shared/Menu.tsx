@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MenuDrawer from 'react-native-side-drawer';
-import { MyContext } from '../App';
+import { GlobalState } from './GlobalState';
 
 class Menu extends Component {
   nav:any;
@@ -47,7 +47,7 @@ class Menu extends Component {
   
   render() {
       return (
-      <MyContext.Consumer> 
+      <GlobalState.Consumer> 
         {context => (
         <>          
         <View style={styles.openButton}>
@@ -69,11 +69,11 @@ class Menu extends Component {
         </MenuDrawer>
         </>
         )}
-      </MyContext.Consumer>
+      </GlobalState.Consumer>
       );
   }
 }
-Menu.contextType = MyContext;
+Menu.contextType = GlobalState;
 
 const styles = StyleSheet.create({
   openButton: {
