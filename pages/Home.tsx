@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, YellowBox, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Menu from '../shared/Menu';
+import AppMenu from '../shared/AppMenu';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { connect, disconnect } from '../services/socket';
 import { GlobalState } from '../shared/GlobalState';
+import Menu, { MenuItem, MenuDivider, Position } from "react-native-enhanced-popup-menu";
 
 YellowBox.ignoreWarnings([ 
   'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?'
@@ -39,19 +41,21 @@ export default class Home extends Component {
     return ( 
       <>
      <View style={styles.mainContainer}>
-
-      <Menu nav={this.props.navigation}></Menu>
+        <AppMenu nav={this.props.navigation}></AppMenu>
 
         <ScrollView style={styles.listContainer}>
-          <GlobalState.Consumer>
-            { context => context.userList.map((item:any, i:any) => (
-                <View key={item.id} style={styles.listItem}>
-                  <View  style={(i === (context.userList.length - 1)) ? styles.textContainer_last : styles.textContainer}>
-                    <Text style={styles.listTextLeft}>{item.name}</Text>
-                  </View>
-                </View>
+          <View style={styles.listItem}>
+            { this.context.userList.map((item:any, i:any) => (
+              <View key={item.id} style={(i === (this.context.userList.length - 1)) ? styles.textContainer_last : styles.textContainer}>
+                <Text style={styles.listTextLeft}>{item.name}</Text>
+                <Icon 
+                name={'chevron-circle-down'}
+                size={30}
+                color='#000000'
+                />
+              </View>
             ))}
-          </GlobalState.Consumer>
+          </View>
         </ScrollView>
       </View>
       </>

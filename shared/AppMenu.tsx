@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import MenuDrawer from 'react-native-side-drawer';
 import { GlobalState } from './GlobalState';
 
-class Menu extends Component {
+class AppMenu extends Component {
   nav:any;
   constructor(props:any) { 
     super(props);
@@ -29,7 +29,7 @@ class Menu extends Component {
       </TouchableOpacity>
       <ScrollView style={styles.listContainer}>
         {this.state.menuList.map((item, i) => (
-          <View key={item.id} style={styles.listItem}>
+          <View key={item.name} style={styles.listItem}>
             <View  style={(i === (this.state.menuList.length - 1)) ? styles.textContainer_last : styles.textContainer}>
               <Text onPress={() => { this.setState({ open: this.context.toggleMenu(!this.context.toggleMenu)}); this.nav.replace(item.name) } } style={styles.listTextLeft}>{item.name}</Text>
             </View>
@@ -51,9 +51,9 @@ class Menu extends Component {
         {context => (
         <>          
         <View style={styles.openButton}>
-          <Icon 
+        <Icon 
           onPress={() => this.setState({ open: context.toggleMenu(!context.menu.open) })}
-          name='bars'
+          name={context.menu.open ? 'close':'bars'}
           size={30}
           color='#000000'
           />
