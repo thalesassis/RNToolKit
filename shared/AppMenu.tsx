@@ -73,7 +73,7 @@ class AppMenu extends Component {
       );
   }
 }
-Menu.contextType = GlobalState;
+AppMenu.contextType = GlobalState;
 
 const styles = StyleSheet.create({
   openButton: {
@@ -134,4 +134,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Menu;
+export default AppMenu;

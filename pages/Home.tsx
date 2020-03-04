@@ -23,11 +23,11 @@ export default class Home extends Component {
 
   componentDidMount() {   
     this.setState({userList: []});
-    if(!this.context.isConnected) {
+    if(!this.context.isConnected && this.props.route.params != undefined) {
       let name = this.props.route.params.name; 
       connect(name, (userList:any) => {     
-        this.setState({userList: this.context.updateUserList(userList)}); 
         this.setState({isConnected: this.context.updateIsConnected(true)}); 
+        this.setState({userList: this.context.updateUserList(userList)}); 
       }) 
     }
   }
