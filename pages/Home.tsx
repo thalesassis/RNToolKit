@@ -12,9 +12,23 @@ YellowBox.ignoreWarnings([
 ])
 
 export default class Home extends Component { 
+  
+  iconRef:any;
+  menuRef:any;
+  setMenuRef:any;
+  users:any = [];
+
   constructor(props:any) { 
     super(props);
+   
+
+    //this.iconRef = React.createRef();
+    //this.setMenuRef = ref => this.menuRef = ref;
   } 
+  
+  
+  hideMenu:any = () => this.menuRef.hide();
+  
 
   state = { 
     open: true,
@@ -30,6 +44,18 @@ export default class Home extends Component {
         this.setState({userList: this.context.updateUserList(userList)}); 
       }) 
     }
+
+    for(let user of this.context.userList) {
+      //console.log(user);
+      
+      user.iconRef = React.createRef();
+      user.menuRef = React.createRef();
+      user.setMenuRef = ref => user.menuRef = ref;
+      user.showMenu = () => user.menuRef.show(user.iconRef.current);
+      this.users.push(user);
+      //console.log(this.users);
+    }
+    console.log(this.users);
   }
 
   componentWillUnmount() {
@@ -45,14 +71,23 @@ export default class Home extends Component {
 
         <ScrollView style={styles.listContainer}>
           <View style={styles.listItem}>
-            { this.context.userList.map((item:any, i:any) => (
-              <View key={item.id} style={(i === (this.context.userList.length - 1)) ? styles.textContainer_last : styles.textContainer}>
+            { this.users.map((item:any, i:any) => (
+              <View key={item.id} style={(i === (this.users.length - 1)) ? styles.textContainer_last : styles.textContainer}>
                 <Text style={styles.listTextLeft}>{item.name}</Text>
-                <Icon 
+
+                <Icon                
+                onPress={() => item.showMenu()}
                 name={'chevron-circle-down'}
-                size={30}
+                size={30} 
                 color='#000000'
                 />
+                <Text ref={item.iconRef}></Text>
+                <Menu ref={item.setMenuRef}>
+                  <MenuItem>Item 1</MenuItem>
+                  <MenuItem>Item 1</MenuItem>
+                  <MenuItem>Item 1</MenuItem>
+                </Menu>
+
               </View>
             ))}
           </View>
