@@ -27,9 +27,6 @@ export default class Home extends Component {
   } 
   
   
-  hideMenu:any = () => this.menuRef.hide();
-  
-
   state = { 
     open: true,
     userList: []
@@ -37,13 +34,22 @@ export default class Home extends Component {
 
   componentDidMount() {   
     this.setState({userList: []});
-    if(!this.context.isConnected && this.props.route.params != undefined) {
+    if(this.context.myId == '') { disconnect(); }
+    if((!this.context.isConnected && this.props.route.params != undefined) || this.context.myId == '') {
       let name = this.props.route.params.name; 
-      connect(name, (userList:any) => {     
-        this.setState({isConnected: this.context.updateIsConnected(true)}); 
-        this.setState({userList: this.context.updateUserList(userList)}); 
+      connect(name, 
+        (userList:any) => {     
+          this.setState({isConnected: this.context.updateIsConnected(true)}); 
+          this.setState({userList: this.context.updateUserList(userList)}); 
+      }, (userId:any, socket:any) => {
+          this.setState({myId: this.context.updateMyId(userId.id)}); 
+          this.setState({myName: this.context.updateMyName(userId.name)});           
+          this.setState({mySocket: this.context.updateMySocket(socket)}); 
       }) 
-    }
+    } 
+
+    console.log("Meu Id");
+    console.log(this.context.myId);
 
     for(let user of this.context.userList) {
       //console.log(user);
@@ -52,10 +58,10 @@ export default class Home extends Component {
       user.menuRef = React.createRef();
       user.setMenuRef = ref => user.menuRef = ref;
       user.showMenu = () => user.menuRef.show(user.iconRef.current);
+      user.hideMenu = () => user.menuRef.hide();
       this.users.push(user);
       //console.log(this.users);
     }
-    console.log(this.users);
   }
 
   componentWillUnmount() {
@@ -81,11 +87,10 @@ export default class Home extends Component {
                 size={30} 
                 color='#000000'
                 />
-                <Text ref={item.iconRef}></Text>
-                <Menu ref={item.setMenuRef}>
-                  <MenuItem>Item 1</MenuItem>
-                  <MenuItem>Item 1</MenuItem>
-                  <MenuItem>Item 1</MenuItem>
+                <Text style={styles.refOpenMenu} ref={item.iconRef}></Text>
+                <Menu ref={item.setMenuRef}> 
+                  <MenuItem onPress={() => { this.props.navigation.navigate('Chat', { userChattingId: item.id, userChatting: item.name }); item.hideMenu(); }}>Send message</MenuItem>
+                  <MenuItem>Track</MenuItem>
                 </Menu>
 
               </View>
@@ -108,6 +113,11 @@ const styles = StyleSheet.create({
     zIndex: 5,
     position: 'absolute',
     backgroundColor: '#F04812' 
+  },
+  refOpenMenu: {
+    position: "absolute",
+    right: 15,
+    bottom: -10
   },
   mainContainer: {
     flex: 1
