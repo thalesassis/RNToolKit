@@ -5,6 +5,8 @@ import MenuDrawer from 'react-native-side-drawer';
 import { GlobalState } from './GlobalState';
 
 class AppMenu extends Component {
+  static contextType = GlobalState;
+  
   nav:any;
   constructor(props:any) { 
     super(props);
@@ -24,14 +26,14 @@ class AppMenu extends Component {
   drawerContent = () => {
     return (
       <>
-      <TouchableOpacity onPress={() => this.setState({ open: this.context.toggleMenu(!this.context.toggleMenu) })} style={styles.animatedBox}>
+      <TouchableOpacity onPress={() => this.setState(this.context.setState({ menu: { open: !this.context.state.menu.open }}))} style={styles.animatedBox}>
         <Text>Close</Text>
       </TouchableOpacity>
       <ScrollView style={styles.listContainer}>
         {this.state.menuList.map((item, i) => (
           <View key={item.name} style={styles.listItem}>
             <View  style={(i === (this.state.menuList.length - 1)) ? styles.textContainer_last : styles.textContainer}>
-              <Text onPress={() => { this.setState({ open: this.context.toggleMenu(!this.context.toggleMenu)}); this.nav.replace(item.name) } } style={styles.listTextLeft}>{item.name}</Text>
+              <Text onPress={() => { this.setState(this.context.setState({ menu: { open: !this.context.state.menu.open }})); this.nav.replace(item.name) } } style={styles.listTextLeft}>{item.name}</Text>
             </View>
           </View>
         )
@@ -42,24 +44,21 @@ class AppMenu extends Component {
   };
   
   componentDidMount() {   
-    this.setState({ open: true });
   }
   
   render() {
       return (
-      <GlobalState.Consumer> 
-        {context => (
         <>          
         <View style={styles.openButton}>
         <Icon 
-          onPress={() => this.setState({ open: context.toggleMenu(!context.menu.open) })}
-          name={context.menu.open ? 'close':'bars'}
+          onPress={() => this.setState(this.context.setState({ menu: { open: !this.context.state.menu.open }}))}
+          name={this.context.state.menu.open ? 'close':'bars'}
           size={30}
           color='#000000'
           />
         </View>
         <MenuDrawer 
-          open={context.menu.open} 
+          open={this.context.state.menu.open} 
           drawerContent={this.drawerContent()}
           drawerPercentage={45}
           animationTime={250}
@@ -68,12 +67,9 @@ class AppMenu extends Component {
         >
         </MenuDrawer>
         </>
-        )}
-      </GlobalState.Consumer>
       );
   }
 }
-AppMenu.contextType = GlobalState;
 
 const styles = StyleSheet.create({
   openButton: {

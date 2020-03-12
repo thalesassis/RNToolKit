@@ -3,16 +3,19 @@ import { StyleSheet, View, Text, YellowBox, Dimensions, ScrollView, TouchableOpa
 import { createStackNavigator } from '@react-navigation/stack';
 import AppMenu from '../shared/AppMenu';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { connect, disconnect } from '../services/socket';
 import { GlobalState } from '../shared/GlobalState';
+import SocketConnect from '../shared/SocketConnect';
+import { connect, disconnect } from '../services/socket';
 import Menu, { MenuItem, MenuDivider, Position } from "react-native-enhanced-popup-menu";
 
 YellowBox.ignoreWarnings([ 
   'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?'
 ])
 
+
 export default class Home extends Component { 
   
+  static contextType = GlobalState;
   iconRef:any;
   menuRef:any;
   setMenuRef:any;
@@ -20,8 +23,8 @@ export default class Home extends Component {
 
   constructor(props:any) { 
     super(props);
-   
 
+      
     //this.iconRef = React.createRef();
     //this.setMenuRef = ref => this.menuRef = ref;
   } 
@@ -33,35 +36,52 @@ export default class Home extends Component {
   }
 
   componentDidMount() {   
-    this.setState({userList: []});
-    if(this.context.myId == '') { disconnect(); }
-    if((!this.context.isConnected && this.props.route.params != undefined) || this.context.myId == '') {
-      let name = this.props.route.params.name; 
-      connect(name, 
+    
+    if(this.context.state.myId == '') { disconnect(); }
+    
+    if(this.context.state.myName != "" && this.context.state.isConnected == false) {
+      connect(this.context.state.myName, 
         (userList:any) => {     
-          this.setState({isConnected: this.context.updateIsConnected(true)}); 
-          this.setState({userList: this.context.updateUserList(userList)}); 
+          this.setState(this.context.setState({isConnected: true})); 
+          this.setState(this.context.setState({userList: userList})); 
+
+          for(let user of this.context.state.userList) {              
+            let nUser:any = {};
+            nUser.id = user.id;      
+            nUser.name = user.name;      
+            nUser.iconRef = React.createRef();
+            nUser.menuRef = React.createRef(); 
+            nUser.setMenuRef = ref => nUser.menuRef = ref;
+            nUser.showMenu = () => nUser.menuRef.show(nUser.iconRef.current);
+            nUser.hideMenu = () => nUser.menuRef.hide();
+            this.users.push(nUser);
+          }
+
       }, (userId:any, socket:any) => {
-          this.setState({myId: this.context.updateMyId(userId.id)}); 
-          this.setState({myName: this.context.updateMyName(userId.name)});           
-          this.setState({mySocket: this.context.updateMySocket(socket)}); 
+        this.setState(this.context.setState({myId: userId.id}));           
+        this.setState(this.context.setState({mySocket: socket})); 
       }) 
-    } 
-
-    console.log("Meu Id");
-    console.log(this.context.myId);
-
-    for(let user of this.context.userList) {
-      //console.log(user);
-      
-      user.iconRef = React.createRef();
-      user.menuRef = React.createRef();
-      user.setMenuRef = ref => user.menuRef = ref;
-      user.showMenu = () => user.menuRef.show(user.iconRef.current);
-      user.hideMenu = () => user.menuRef.hide();
-      this.users.push(user);
-      //console.log(this.users);
+    } else {
+      console.log(this.context.state.userList);
+      for(let user of this.context.state.userList) {      
+        let nUser:any = {};
+        nUser.id = user.id;      
+        nUser.name = user.name;      
+        nUser.iconRef = React.createRef();
+        nUser.menuRef = React.createRef(); 
+        nUser.setMenuRef = ref => nUser.menuRef = ref; 
+        nUser.showMenu = () => nUser.menuRef.show(nUser.iconRef.current);
+        nUser.hideMenu = () => nUser.menuRef.hide();
+        this.users.push(nUser);
+      }
     }
+    
+    console.log(this.users);
+
+    console.log("My Id");
+    console.log(this.context.state.myId); 
+
+    
   }
 
   componentWillUnmount() {
@@ -102,8 +122,6 @@ export default class Home extends Component {
     );
   }
 }
-
-Home.contextType = GlobalState;
 
 const styles = StyleSheet.create({
   openButton: {

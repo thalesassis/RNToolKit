@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import { ScrollView, StyleSheet, View, Text, Button, TextInput, Alert, Dimensions } from 'react-native';
 import {request, check, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import { GlobalState } from '../shared/GlobalState';
 
 
 export default class Permissions extends Component {  
+  
+  static contextType = GlobalState;
   state = {
     name: "",
     permissions: [{
@@ -118,7 +121,8 @@ export default class Permissions extends Component {
           disabled={!this.isAllGranted() || this.state.name.length == 0}
           title="Start App" 
           onPress={() => { 
-            this.nav.replace('Home',{name:this.state.name}) 
+            this.context.setState({myName: this.state.name});
+            this.nav.replace('Home');
           }}
         />
         </View>  
@@ -128,7 +132,6 @@ export default class Permissions extends Component {
     );
   }
 }
-
 
 const styles = StyleSheet.create({
   mainContainer: {
