@@ -14,7 +14,7 @@ import { initialState, GlobalState } from './shared/GlobalState';
 
 class App extends Component {
   state = initialState;
-
+  
   render() {
     return (
       <>

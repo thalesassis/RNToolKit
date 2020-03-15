@@ -4,8 +4,8 @@ import { initialState } from '../shared/GlobalState';
 const socket = io('http://192.168.0.103:3002', {autoConnect: false});
 
 
-function connect(userName, callbackConnected:any, callbackUserId:any) { 
-  socket.connect();
+async function connect(userName, callbackConnected:any, callbackUserId:any) { 
+  await socket.connect();
   socket.on('connect', () => {     
     socket.emit("newUser",{ name: userName });
   });
@@ -30,4 +30,23 @@ function disconnect() {
   }
 }
 
-export { connect, disconnect, socket };
+function connectSocket(upperContext,callback) {
+  if(upperContext.context.state.myId == '') { disconnect(); }
+    
+  if(upperContext.context.state.myName != "" && upperContext.context.state.isConnected == false) {
+    console.log("connecting");
+    connect(upperContext.context.state.myName, 
+      (userList:any) => {     
+        upperContext.setState(upperContext.context.setState({isConnected: true})); 
+        upperContext.setState(upperContext.context.setState({userList: userList})); 
+    }, (userId:any, socket:any) => {
+        upperContext.setState(upperContext.context.setState({myId: userId.id}));           
+        upperContext.setState(upperContext.context.setState({mySocket: socket})); 
+        callback();
+    }) 
+  } else {
+    callback();
+  }
+}
+
+export { connect, disconnect, socket, connectSocket };

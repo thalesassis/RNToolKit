@@ -1,11 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, useCallback } from 'react';
 import { StyleSheet, View, Text, YellowBox, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import AppMenu from '../shared/AppMenu';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { GlobalState } from '../shared/GlobalState';
-import SocketConnect from '../shared/SocketConnect';
-import { connect, disconnect } from '../services/socket';
+import { connect, disconnect, socket, connectSocket } from '../services/socket';
 import Menu, { MenuItem, MenuDivider, Position } from "react-native-enhanced-popup-menu";
 
 YellowBox.ignoreWarnings([ 
@@ -16,52 +15,21 @@ YellowBox.ignoreWarnings([
 export default class Home extends Component { 
   
   static contextType = GlobalState;
-  iconRef:any;
-  menuRef:any;
-  setMenuRef:any;
-  users:any = [];
 
   constructor(props:any) { 
     super(props);
-
-      
-    //this.iconRef = React.createRef();
-    //this.setMenuRef = ref => this.menuRef = ref;
   } 
   
-  
+  users:any = [];
   state = { 
     open: true,
     userList: []
   }
 
-  componentDidMount() {   
+  componentDidMount() {  
     
-    if(this.context.state.myId == '') { disconnect(); }
-    
-    if(this.context.state.myName != "" && this.context.state.isConnected == false) {
-      connect(this.context.state.myName, 
-        (userList:any) => {     
-          this.setState(this.context.setState({isConnected: true})); 
-          this.setState(this.context.setState({userList: userList})); 
-
-          for(let user of this.context.state.userList) {              
-            let nUser:any = {};
-            nUser.id = user.id;      
-            nUser.name = user.name;      
-            nUser.iconRef = React.createRef();
-            nUser.menuRef = React.createRef(); 
-            nUser.setMenuRef = ref => nUser.menuRef = ref;
-            nUser.showMenu = () => nUser.menuRef.show(nUser.iconRef.current);
-            nUser.hideMenu = () => nUser.menuRef.hide();
-            this.users.push(nUser);
-          }
-
-      }, (userId:any, socket:any) => {
-        this.setState(this.context.setState({myId: userId.id}));           
-        this.setState(this.context.setState({mySocket: socket})); 
-      }) 
-    } else {
+    let context = this;
+    connectSocket(context, () => {
       console.log(this.context.state.userList);
       for(let user of this.context.state.userList) {      
         let nUser:any = {};
@@ -73,15 +41,10 @@ export default class Home extends Component {
         nUser.showMenu = () => nUser.menuRef.show(nUser.iconRef.current);
         nUser.hideMenu = () => nUser.menuRef.hide();
         this.users.push(nUser);
-      }
-    }
-    
-    console.log(this.users);
-
-    console.log("My Id");
-    console.log(this.context.state.myId); 
-
-    
+      } 
+      this.setState({ userList: this.users });
+      
+    });  
   }
 
   componentWillUnmount() {
@@ -97,7 +60,7 @@ export default class Home extends Component {
 
         <ScrollView style={styles.listContainer}>
           <View style={styles.listItem}>
-            { this.users.map((item:any, i:any) => (
+            { this.state.userList.map((item:any, i:any) => (
               <View key={item.id} style={(i === (this.users.length - 1)) ? styles.textContainer_last : styles.textContainer}>
                 <Text style={styles.listTextLeft}>{item.name}</Text>
 
