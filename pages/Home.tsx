@@ -4,7 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import AppMenu from '../shared/AppMenu';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { GlobalState } from '../shared/GlobalState';
-import { connect, disconnect, socket, connectSocket } from '../services/socket';
+import { connectSocket } from '../services/socket';
 import Menu, { MenuItem, MenuDivider, Position } from "react-native-enhanced-popup-menu";
 
 YellowBox.ignoreWarnings([ 
@@ -28,8 +28,7 @@ export default class Home extends Component {
 
   componentDidMount() {  
     
-    let context = this;
-    connectSocket(context, () => {
+    connectSocket(this, () => {
       console.log(this.context.state.userList);
       for(let user of this.context.state.userList) {      
         let nUser:any = {};
@@ -52,7 +51,7 @@ export default class Home extends Component {
     //disconnect();
   } 
 
-  render() {
+  render() { 
     return ( 
       <>
      <View style={styles.mainContainer}>

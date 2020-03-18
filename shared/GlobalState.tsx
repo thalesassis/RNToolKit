@@ -9,6 +9,7 @@ export const initialState = {
     menu: {
       open: false
     },
+    messages: [],
     userList: []
   },
   setState: (prop:any) => {

@@ -18,9 +18,6 @@ async function connect(userName, callbackConnected:any, callbackUserId:any) {
     callbackUserId(userId,socket);
   })  
   
-  socket.on("newMessage", function(msg:any) {
-    console.log("Nova mensagem recebida");
-  })
 }
 
 function disconnect() {
@@ -31,11 +28,13 @@ function disconnect() {
 }
 
 function connectSocket(upperContext,callback) {
-  if(upperContext.context.state.myId == '') { disconnect(); }
-    
-  if(upperContext.context.state.myName != "" && upperContext.context.state.isConnected == false) {
-    console.log("connecting");
-    connect(upperContext.context.state.myName, 
+  //if(upperContext.context.state.myId == '') { disconnect(); }
+  
+  let myUserExist = upperContext.context.state.userList.filter((socket:any)=>{ return socket.id == upperContext.context.state.myId });
+  
+  if(myUserExist.length == 0) {
+      console.log("connecting");
+      connect(upperContext.context.state.myName,
       (userList:any) => {     
         upperContext.setState(upperContext.context.setState({isConnected: true})); 
         upperContext.setState(upperContext.context.setState({userList: userList})); 
@@ -45,6 +44,7 @@ function connectSocket(upperContext,callback) {
         callback();
     }) 
   } else {
+    console.log("already connected");
     callback();
   }
 }

@@ -2,27 +2,18 @@ import React, { Component } from 'react';
 import { ScrollView, StyleSheet, View, Text, Button, TextInput, Alert, Dimensions } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import AppMenu from '../shared/AppMenu';
-import { socket } from '../services/socket';
+import { connectSocket } from '../services/socket';
 import { GlobalState } from '../shared/GlobalState';
 
 export default class Chat extends Component {
+
+  static contextType = GlobalState;
 
   state = {
     message: "",
     userChatting: "",
     userChattingId: "",
-    messages: [{
-      fromId: "",
-      toId: "",
-      fromName: "Thales",
-      message: "Olá"
-    },
-    {
-      fromId: "",
-      toId: "",
-      fromName: "Thales",
-      message: "Olá"
-    }]
+    messages: []
   };
 
   socket:any;
@@ -32,17 +23,38 @@ export default class Chat extends Component {
   }
 
   sendMessage() {
-    let message:any = {to: this.state.userChattingId, from: this.context.myId, message: this.state.message };
-    this.context.mySocket.emit("messageTo",message);
+    let message:any = {toId: this.state.userChattingId, fromId: this.context.state.myId, fromName: this.context.state.myName, message: this.state.message };
+    this.context.state.mySocket.emit("messageTo",message);
     this.setState({message:''});
-  }
+  } 
 
   refreshMessages() {
 
   }
 
   componentDidMount() {
+    console.log(this.context.state.myId);
+    this.setState(this.context.setState({messages: []})); 
+
+    let context = this;
+    connectSocket(context, () => { 
+      console.log("connected");
+          
+      this.context.state.mySocket.on("newMessage", (msg:any) => {
+        console.log("nova msg emitida");
+        this.setState(this.context.setState(
+        {
+          messages: [...this.context.state.messages, msg]
+        }
+        )); 
+             
+      })
+
+    });  
+
     this.setState({ userChatting: this.props.route.params.userChatting, userChattingId: this.props.route.params.userChattingId });
+
+    console.log(this.context.state.messages);
   }
   
   handleMessage(text:string) {
@@ -59,9 +71,11 @@ export default class Chat extends Component {
           <Text>Chatting with {this.state.userChatting}</Text>
           </View>
 
-        <ScrollView style={styles.scroller}>
+        <ScrollView ref="scrollView" style={styles.scroller}
+          onContentSizeChange={(width,height) => this.refs.scrollView.scrollTo({y:height})}
+        >
         { this.state.messages.map((item:any, i:any) => (
-          <View key={item.id} style={styles.balloon}>
+          <View key={item.fromId+"_"+item.toId+"_"+i} style={styles.balloon}>
             <Text>{item.fromName}</Text>
             <Text>{item.message}</Text>
           </View>
@@ -75,10 +89,14 @@ export default class Chat extends Component {
             placeholder="Message"
             onChangeText={text => this.handleMessage(text)}
             value={this.state.message}
+            returnKeyType="done"
+            onSubmitEditing={() => {
+              this.sendMessage();
+            }}
           />
 
           <Button 
-            title="Send message" 
+            title="Send message"  
             onPress={() => { 
               this.sendMessage()
             }}
@@ -91,8 +109,6 @@ export default class Chat extends Component {
   }
 }
 
-Chat.contextType = GlobalState;
-
 const styles = StyleSheet.create({
   MainContainer: {
     flex: 1,
@@ -100,7 +116,7 @@ const styles = StyleSheet.create({
   scroller: {
     position: 'absolute',
     top: 30,
-    bottom: 40,
+    bottom: 105,
     left: 10,
     right: 10
   },
