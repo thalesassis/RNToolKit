@@ -39,11 +39,13 @@ export default class Chat extends Component {
     let context = this;
     connectSocket(context, () => { 
       console.log("connected");
-          
+      
+      this.context.state.mySocket.off("newMessage");
+
       this.context.state.mySocket.on("newMessage", (msg:any) => {
         console.log("nova msg emitida");
         this.setState(this.context.setState(
-        {
+        { 
           messages: [...this.context.state.messages, msg]
         }
         )); 
