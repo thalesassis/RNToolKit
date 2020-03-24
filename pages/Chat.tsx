@@ -69,15 +69,15 @@ export default class Chat extends Component {
       <View style={styles.MainContainer}>
         <AppMenu nav={this.props.navigation}></AppMenu>
 
-        <View>
+        <View style={styles.chattingWith}>
           <Text>Chatting with {this.state.userChatting}</Text>
-          </View>
+        </View>
 
         <ScrollView ref="scrollView" style={styles.scroller}
           onContentSizeChange={(width,height) => this.refs.scrollView.scrollTo({y:height})}
         >
         { this.state.messages.map((item:any, i:any) => (
-          <View key={item.fromId+"_"+item.toId+"_"+i} style={styles.balloon}>
+          <View key={item.fromId+"_"+item.toId+"_"+i} style={ item.fromId == this.context.state.myId ? styles.myBalloon : styles.balloon}>
             <Text>{item.fromName}</Text>
             <Text>{item.message}</Text>
           </View>
@@ -128,6 +128,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#CFCFCF',
     marginBottom: 10
   },
+  myBalloon: {
+    padding: 5,
+    borderRadius: 8,
+    backgroundColor: '#daffba',
+    marginBottom: 10
+  },
   textInput: {
     padding: 10,
     height: 40, 
@@ -140,5 +146,11 @@ const styles = StyleSheet.create({
     bottom: 15,
     left: 15,
     right: 15
+  },
+  chattingWith: {
+    paddingLeft: 12,
+    paddingRight: 12,
+    paddingTop: 7,
+    paddingBottom: 15,
   }
 });
