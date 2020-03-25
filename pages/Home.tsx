@@ -27,21 +27,28 @@ export default class Home extends Component {
   }
 
   componentDidMount() {  
-    
+  
     connectSocket(this, () => {
-      console.log(this.context.state.userList);
-      for(let user of this.context.state.userList) {      
-        let nUser:any = {};
-        nUser.id = user.id;      
-        nUser.name = user.name;      
-        nUser.iconRef = React.createRef();
-        nUser.menuRef = React.createRef(); 
-        nUser.setMenuRef = ref => nUser.menuRef = ref; 
-        nUser.showMenu = () => nUser.menuRef.show(nUser.iconRef.current);
-        nUser.hideMenu = () => nUser.menuRef.hide();
-        this.users.push(nUser);
-      } 
-      this.setState({ userList: this.users });
+
+      this.context.state.mySocket.emit("askUserList", this.context.state.myId);
+
+      this.context.state.mySocket.off('askUserList');
+      this.context.state.mySocket.on("userList", (userList:any) => {
+      
+        this.setState(this.context.setState({userList: userList})); 
+        for(let user of this.context.state.userList) {      
+          let nUser:any = {};
+          nUser.id = user.id;      
+          nUser.name = user.name;      
+          nUser.iconRef = React.createRef();
+          nUser.menuRef = React.createRef(); 
+          nUser.setMenuRef = ref => nUser.menuRef = ref; 
+          nUser.showMenu = () => nUser.menuRef.show(nUser.iconRef.current);
+          nUser.hideMenu = () => nUser.menuRef.hide();
+          this.users.push(nUser);
+        } 
+        this.setState({ userList: this.users });     
+      })
       
     });  
   }
@@ -59,7 +66,8 @@ export default class Home extends Component {
 
         <ScrollView style={styles.listContainer}>
           <View style={styles.listItem}>
-            { this.state.userList.map((item:any, i:any) => (
+            { this.state.userList.map((item:any, i:any) => (item.id != this.context.state.myId) && (
+              
               <View key={item.id} style={(i === (this.users.length - 1)) ? styles.textContainer_last : styles.textContainer}>
                 <Text style={styles.listTextLeft}>{item.name}</Text>
 
