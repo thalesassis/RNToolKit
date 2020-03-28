@@ -23,7 +23,8 @@ export default class Home extends Component {
   users:any = [];
   state = { 
     open: true,
-    userList: []
+    userList: [],
+    notifications: []
   }
 
   componentDidMount() {  
@@ -49,8 +50,24 @@ export default class Home extends Component {
         } 
         this.setState({ userList: this.users });     
       })
+
+      this.context.state.mySocket.off("newMessage");
+      this.context.state.mySocket.on("newMessage", (msg:any) => {
+        console.log("nova msg recebida");
+        this.setState(this.context.setState(
+        { 
+          notifications: [...this.context.state.notifications, msg]
+        })
+        ); 
+        console.log(this.state.notifications);
+             
+      })
       
     });  
+  }
+
+  chatWith(userId:any, userName:any) {
+    this.props.navigation.navigate('Chat', { userChattingId: userId, userChatting: userName });
   }
 
   componentWillUnmount() {
@@ -87,13 +104,47 @@ export default class Home extends Component {
             ))}
           </View>
         </ScrollView>
+        <ScrollView style={styles.notifications} horizontal={true}>
+          <View style={styles.sub_notifications}>
+            { this.state.notifications.map((item:any, i:any) => (
+                <TouchableOpacity onPress={() => this.chatWith(item.userId, item.userName)} style={styles.notificationItem}>
+                  <Text>A</Text>
+                </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
       </View>
+      
       </>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  notifications: {
+    display: 'flex',
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    left: 0,
+    height: 70,
+    backgroundColor: '#CFCFCF',
+  },
+  sub_notifications: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'nowrap'
+  },
+  notificationItem: {
+    display: 'flex',
+    width: 50, 
+    height: 50,
+    marginLeft: 5,
+    marginRight: 5,
+    marginTop: 10,
+    borderRadius: 50,
+    backgroundColor: '#FFF'
+  },
   openButton: {
     flex: 1,
     top: 30,
@@ -159,12 +210,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignContent: 'flex-end',
     textAlign: 'right'
-  },
-  body: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F04812'
   }
   
 });

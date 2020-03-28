@@ -10,7 +10,8 @@ export const initialState = {
       open: false
     },
     messages: [],
-    userList: []
+    userList: [],
+    notifications: []
   },
   setState: (prop:any) => {
     return (initialState.state = {...initialState.state, ...prop})

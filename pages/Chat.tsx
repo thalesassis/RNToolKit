@@ -23,7 +23,7 @@ export default class Chat extends Component {
   }
 
   sendMessage() {
-    let message:any = {toId: this.state.userChattingId, fromId: this.context.state.myId, fromName: this.context.state.myName, message: this.state.message };
+    let message:any = {toId: this.state.userChattingId, fromId: this.context.state.myId, fromName: this.context.state.myName, message: this.state.message, read: false };
     this.context.state.mySocket.emit("messageTo",message);
     this.setState({message:''});
   } 
@@ -34,7 +34,7 @@ export default class Chat extends Component {
 
   componentDidMount() {
     console.log(this.context.state.myId);
-    this.setState(this.context.setState({messages: []})); 
+    this.setState({ messages: this.context.state.messages }); 
 
     let context = this;
     connectSocket(context, () => { 
@@ -120,7 +120,8 @@ const styles = StyleSheet.create({
     top: 30,
     bottom: 105,
     left: 10,
-    right: 10
+    right: 10,
+    borderRadius: 4,
   },
   balloon: {
     padding: 5,
