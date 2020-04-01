@@ -24,7 +24,7 @@ export default class Home extends Component {
   state = { 
     open: true,
     userList: [],
-    notifications: []
+    showNotifications: []
   }
 
   componentDidMount() {  
@@ -49,21 +49,47 @@ export default class Home extends Component {
           this.users.push(nUser);
         } 
         this.setState({ userList: this.users });     
+        
       })
 
       this.context.state.mySocket.off("newMessage");
       this.context.state.mySocket.on("newMessage", (msg:any) => {
-        console.log("nova msg recebida");
         this.setState(this.context.setState(
-        { 
-          notifications: [...this.context.state.notifications, msg]
-        })
-        ); 
-        console.log(this.state.notifications);
-             
+          { 
+            notifications: [...this.context.state.notifications, msg]
+          })
+          ); 
+
+          this.setState(this.context.setState(
+          { 
+            messages: [...this.context.state.messages, msg]
+          })
+          ); 
+
+        this.getNotifications();
       })
+
+      this.getNotifications();
+      
       
     });  
+  }
+
+  getNotifications() {
+      
+      let addNotifs:any = [];
+      this.context.state.notifications.map((item:any) => {
+        if(!item.read && item.toId == this.context.state.myId) {
+          let filt:any = addNotifs.filter((notif:any) => { return (notif.fromId == item.fromId) });
+          if(filt.length == 0) {
+            item.qtd = 1;
+            addNotifs.push(item);
+          } else {
+            addNotifs.filter((notif:any) => { return (notif.fromId == item.fromId) })[0].qtd = Number(filt[0].qtd) + Number(1);
+          }
+        }
+      })
+      this.setState({showNotifications: addNotifs});             
   }
 
   chatWith(userId:any, userName:any) {
@@ -106,9 +132,9 @@ export default class Home extends Component {
         </ScrollView>
         <ScrollView style={styles.notifications} horizontal={true}>
           <View style={styles.sub_notifications}>
-            { this.state.notifications.map((item:any, i:any) => (
-                <TouchableOpacity onPress={() => this.chatWith(item.userId, item.userName)} style={styles.notificationItem}>
-                  <Text>A</Text>
+            { this.state.showNotifications.map((item:any, i:any) => (
+                <TouchableOpacity key={item.id} onPress={() => this.chatWith(item.userId, item.userName)} style={styles.notificationItem}>
+                  <Text style={styles.textNotification}>{item.qtd} mensagens de { item.fromName }</Text>
                 </TouchableOpacity>
             ))}
           </View>
@@ -130,6 +156,9 @@ const styles = StyleSheet.create({
     height: 70,
     backgroundColor: '#CFCFCF',
   },
+  textNotification: {
+    width: 100
+  },
   sub_notifications: {
     display: 'flex',
     flexDirection: 'row',
@@ -137,12 +166,12 @@ const styles = StyleSheet.create({
   },
   notificationItem: {
     display: 'flex',
-    width: 50, 
-    height: 50,
+    borderRadius: 5,
+    margin: 10,
+    lineHeight: 50,
+    padding: 7,
     marginLeft: 5,
     marginRight: 5,
-    marginTop: 10,
-    borderRadius: 50,
     backgroundColor: '#FFF'
   },
   openButton: {
